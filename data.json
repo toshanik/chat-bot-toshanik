@@ -1,0 +1,14 @@
+{
+  "values": [
+    {
+      "question":"да",
+      "answer": "Пезда",
+      "type": "text"
+    },
+    {
+      "question":"нет",
+      "answer": "Пидора ответ",
+      "type": "text"
+    }
+  ]
+}
