@@ -38,7 +38,10 @@ def get_data():
 
 
 def remove_word(word, text):
-    text = re.sub(word, '', text)
+    index = text.find(word)
+    text= text[:index]
+    #text2 = text[word.__len__():]
+    #text = re.sub(word, '', text)
     return text.strip()
 
 
@@ -125,6 +128,12 @@ def send_photo(vk, peer_id, owner_id, photo_id, access_key):
         attachment=attachment
     )
 if __name__ == '__main__':
+    a = '{мем?}'
+    text = 'мама мыла раму? {мем?}'
+    remove_word(a,text)
+    b = ''
+
+
     vk_session = vk_api.VkApi(token='d46a2fe9935df81a4ab27e37f897fb43bd123237bcab1ec388cfdf72f2f84c87c0148f83f04ec04745860')
     longpoll = VkBotLongPoll(vk_session, 204155469)
     vk = vk_session.get_api()
