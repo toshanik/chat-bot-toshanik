@@ -56,11 +56,9 @@ def messages_send(message, chat_id):
 
 def get_text(event):
     try:
-        text = event.object.text.strip()
+        return event.object.text.strip()
     except:
-        send_error_message("#1 Не удалось получить текст")
         return ""
-    return text
 
 
 def send_error_message(message):
@@ -85,6 +83,27 @@ def add_word(type, spec_word, answer="", ):
     message = f'Добавлена фраза: {spec_word}\nС ответом: {answer}'
     messages_send(message, event.chat_id)
     return
+
+def delete_word(spec_word):
+    check = True
+    while check:
+        check_check = False
+        count = -1
+        for value in data['values']:
+            count += 1
+            if value['question'] == spec_word:
+                data['values'].pop(count)
+                check_check = True
+                break;
+        data2 = data
+        if not check_check:
+            check = False
+    path.write_text(json.dumps(data), encoding='utf-8')
+
+    message = f'Удалена фраза: {spec_word}'
+    messages_send(message, event.chat_id)
+    return
+
 
 def upload_photo(upload, url):
     img = requests.get(url).content
@@ -119,8 +138,8 @@ if __name__ == '__main__':
     ts = '1'
 
     keyboard = VkKeyboard(one_time=True)
-    keyboard.add_button('Привет', color=VkKeyboardColor.NEGATIVE)
-    keyboard.add_button('!Клавиатура', color=VkKeyboardColor.POSITIVE)
+    keyboard.add_button('!Справка', color=VkKeyboardColor.POSITIVE)
+    keyboard.add_button('!Словарь', color=VkKeyboardColor.NEGATIVE)
 
     print("hello world")
 
@@ -128,31 +147,40 @@ if __name__ == '__main__':
     data = json.loads(path.read_text(encoding='utf-8'))
     for event in longpoll.listen():
         if event.type == VkBotEventType.MESSAGE_NEW:
-            text = get_text(event).lower()
-            if (text == ""):
+            textNormal = get_text(event)
+            textLower = textNormal.lower()
+            if (textLower == ""):
                 continue
-            for item in data['values']:
-                if (item['question'] == text):
-                    if item['type'] == 'text':
-                        messages_send(item['answer'], event.chat_id)
-                        break;
-                    '''
-                    elif item['type'] == 'photo':
-                        send_photo(vk, event.chat_id, *upload_photo(upload, item['answer']))
-                        #if(item['answer'] != ""): messages_send(item['answer'], event.chat_id)
-                        '''
-
-            if '!добавить' in text:
+            if '!добавить' in textLower:
                 if event.from_chat:
                     answer = ""
-                    spec_word = remove_word('!добавить', get_text(event))
+                    spec_word = remove_word('!добавить', textNormal)
                     spec_word = remove_word('!Добавить', spec_word)
 
                     if spec_word.find("{") > 0 and spec_word.find("}") > 0:
                         answer = spec_word[spec_word.find("{"): spec_word.find("}") + 1]
                         spec_word = remove_word(answer, spec_word)
+
+                        used = False
+                        for item in data['values']:
+                            if (item['question'] == spec_word):
+                                used =True
+                                break;
+                        if (used):
+                            delete_word(spec_word)
                         add_word('text', spec_word, answer[1:-1])
+
+
+
                     '''
+                    PATH.write_text(json.dumps(users_time), encoding='utf-8')
+                    
+                    
+                    users_online = json.loads(data.text)['response']
+                    for item in users_online:
+                        users_time[item['id']] = item['online']
+        
+        
                     if spec_word.find("[") > 0 and spec_word.find("]") > 0:
                         answer = spec_word[spec_word.find("["): spec_word.find("]") + 1]
                         spec_word = remove_word(answer, spec_word)
@@ -179,9 +207,32 @@ if __name__ == '__main__':
                         message='Держи',
                         chat_id=event.chat_id
                     )
-            if '!справка' in text:
+            if '!справка' in textLower:
                 if event.from_chat:
-                    messages_send('Доступные команды \n!добавить \n!клавиатура', event.chat_id)
+                    messages_send('Доступные команды \n!Добавить \n!Клавиатура \n!Справка \n!Словарь \n!Удалить', event.chat_id)
+            if '!словарь' in textLower:
+                if event.from_chat:
+                    text = ""
+                    for item in data['values']:
+                        text += item['question']+" -> "+item['answer']+"\n"
+                    messages_send(text, event.chat_id)
+            if '!удалить' in textLower:
+                if event.from_chat:
+                    spec_word = remove_word('!удалить', textLower)
+                    if spec_word == "":
+                        messages_send("Добавьте фразу, которую нужно удалить", event.chat_id)
+                    else:
+                        delete_word(spec_word)
+            for item in data['values']:
+                if (item['question'] == textLower):
+                    if item['type'] == 'text':
+                        messages_send(item['answer'], event.chat_id)
+                        break;
+                    '''
+                    elif item['type'] == 'photo':
+                        send_photo(vk, event.chat_id, *upload_photo(upload, item['answer']))
+                        #if(item['answer'] != ""): messages_send(item['answer'], event.chat_id)
+                        '''
 
     '''
     for event in Lslongpoll.listen():
