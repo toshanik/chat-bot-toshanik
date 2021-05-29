@@ -53,6 +53,18 @@ def messages_send(message, chat_id):
     )
     return
 
+def messages_send_attachment(message, chat_id, owner_id, photo_id, access_key):
+    attachment = f'photo{owner_id}_{photo_id}_{access_key}'
+    vk.messages.send(
+        key=('5e10586fd85a211cb5e26fe53f5ba3f477caa84d'),  # ВСТАВИТЬ ПАРАМЕТРЫ
+        server=('https://lp.vk.com/wh204155469'),
+        ts=('1'),
+        random_id=get_random_id(),
+        message=message,
+        chat_id=chat_id,
+        attachment=attachment
+    )
+    return
 
 def get_text(event):
     try:
@@ -60,31 +72,18 @@ def get_text(event):
     except:
         return ""
 
-
-def send_error_message(message):
-    vk.messages.send(
-        key=key,
-        server=server,
-        ts=ts,
-        random_id=get_random_id(),
-        message=message,
-        chat_id=1
-    )
-    print(message)
-    return
-
-
 def add_word(type, spec_word, answer="", ):
     data['values'].append({'question': spec_word.lower(), 'answer': answer, 'type': type})
     path.write_text(json.dumps(data), encoding='utf-8')
 
-    if(type == 'photo'):
-        answer='Изображение'
+    #if(type == 'photo'):
+    #    answer='Изображение'
     message = f'Добавлена фраза: {spec_word}\nС ответом: {answer}'
     messages_send(message, event.chat_id)
     return
 
 def delete_word(spec_word):
+    spec_word=spec_word.lower()
     check = True
     while check:
         check_check = False
@@ -122,7 +121,7 @@ def send_photo(vk, peer_id, owner_id, photo_id, access_key):
     attachment = f'photo{owner_id}_{photo_id}_{access_key}'
     vk.messages.send(
         random_id=get_random_id(),
-        peer_id=peer_id,
+        chat_id=chat_id,
         attachment=attachment
     )
 if __name__ == '__main__':
@@ -154,7 +153,7 @@ if __name__ == '__main__':
             if '!добавить' in textLower:
                 if event.from_chat:
                     answer = ""
-                    spec_word = remove_word('!добавить', textNormal)
+                    spec_word = remove_word('!добавить', textLower)
                     spec_word = remove_word('!Добавить', spec_word)
 
                     if spec_word.find("{") > 0 and spec_word.find("}") > 0:
@@ -170,32 +169,22 @@ if __name__ == '__main__':
                             delete_word(spec_word)
                         add_word('text', spec_word, answer[1:-1])
 
-
-
-                    '''
-                    PATH.write_text(json.dumps(users_time), encoding='utf-8')
-                    
-                    
-                    users_online = json.loads(data.text)['response']
-                    for item in users_online:
-                        users_time[item['id']] = item['online']
-        
-        
-                    if spec_word.find("[") > 0 and spec_word.find("]") > 0:
-                        answer = spec_word[spec_word.find("["): spec_word.find("]") + 1]
-                        spec_word = remove_word(answer, spec_word)
-                        add_word('photo', spec_word, answer[1:-1])
-                    if (answer == ''):
+                    if (answer == ""):
                         try:
                             for item in event.object['attachments']:
                                 if 'photo' in item:
                                     url = item['photo']['sizes'][-1]['url']
+                                used = False
+                                for item in data['values']:
+                                    if (item['question'] == spec_word):
+                                        used = True
+                                        break;
+                                if (used):
+                                    delete_word(spec_word)
                                 add_word('photo', spec_word, url)
+                                break;
                         except:
-                            send_error_message("#2 Не удалось получить фото в сообщении")
-    '''
-
-
+                            messages_send("#2 Не удалось получить фото в сообщении", event.chat_id)
             if '!клавиатура' == event.object.text.lower().strip():
                 if event.from_chat:
                     vk.messages.send(
@@ -220,7 +209,7 @@ if __name__ == '__main__':
                 if event.from_chat:
                     spec_word = remove_word('!удалить', textLower)
                     if spec_word == "":
-                        messages_send("Добавьте фразу, которую нужно удалить", event.chat_id)
+                        messages_send("Добавьте фразу     (Например: \"!Удалить да\")", event.chat_id)
                     else:
                         delete_word(spec_word)
             for item in data['values']:
@@ -228,11 +217,10 @@ if __name__ == '__main__':
                     if item['type'] == 'text':
                         messages_send(item['answer'], event.chat_id)
                         break;
-                    '''
                     elif item['type'] == 'photo':
-                        send_photo(vk, event.chat_id, *upload_photo(upload, item['answer']))
+                        messages_send_attachment("", event.chat_id,*upload_photo(upload, item['answer']))
+                        #send_photo(vk, event.chat_id, *upload_photo(upload, item['answer']))
                         #if(item['answer'] != ""): messages_send(item['answer'], event.chat_id)
-                        '''
 
     '''
     for event in Lslongpoll.listen():
