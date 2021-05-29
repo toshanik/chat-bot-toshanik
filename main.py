@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
     keyboard = VkKeyboard(one_time=True)
     keyboard.add_button('Привет', color=VkKeyboardColor.NEGATIVE)
-    keyboard.add_button('Клавиатура', color=VkKeyboardColor.POSITIVE)
+    keyboard.add_button('!Клавиатура', color=VkKeyboardColor.POSITIVE)
 
     print("hello world")
 
@@ -135,6 +135,7 @@ if __name__ == '__main__':
                 if (item['question'] == text):
                     if item['type'] == 'text':
                         messages_send(item['answer'], event.chat_id)
+                        break;
                     '''
                     elif item['type'] == 'photo':
                         send_photo(vk, event.chat_id, *upload_photo(upload, item['answer']))
@@ -167,7 +168,7 @@ if __name__ == '__main__':
     '''
 
 
-            if 'клавиатура' == event.object.text.lower().strip():
+            if '!клавиатура' == event.object.text.lower().strip():
                 if event.from_chat:
                     vk.messages.send(
                         keyboard=keyboard.get_keyboard(),
@@ -178,6 +179,9 @@ if __name__ == '__main__':
                         message='Держи',
                         chat_id=event.chat_id
                     )
+            if '!справка' in text:
+                if event.from_chat:
+                    messages_send('Доступные команды \n!добавить \n!клавиатура', event.chat_id)
 
     '''
     for event in Lslongpoll.listen():
