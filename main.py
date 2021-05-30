@@ -39,10 +39,13 @@ def get_data():
 
 def remove_word(word, text):
     index = text.find(word)
-    text= text[:index]
-    #text2 = text[word.__len__():]
+    if index == -1:
+        return text.strip()
+    text1 = text[:index]
+    text2 = text[index+word.__len__():]
+    text3 = text1+text2
     #text = re.sub(word, '', text)
-    return text.strip()
+    return text3.strip()
 
 
 def messages_send(message, chat_id):
@@ -78,15 +81,13 @@ def get_text(event):
 def add_word(type, spec_word, answer="", ):
     data['values'].append({'question': spec_word.lower(), 'answer': answer, 'type': type})
     path.write_text(json.dumps(data), encoding='utf-8')
-
-    #if(type == 'photo'):
-    #    answer='Изображение'
     message = f'Добавлена фраза: {spec_word}\nС ответом: {answer}'
     messages_send(message, event.chat_id)
     return
 
 def delete_word(spec_word):
     spec_word=spec_word.lower()
+    answer = ''
     check = True
     while check:
         check_check = False
@@ -94,15 +95,15 @@ def delete_word(spec_word):
         for value in data['values']:
             count += 1
             if value['question'] == spec_word:
+                answer = value['answer']
                 data['values'].pop(count)
                 check_check = True
                 break;
-        data2 = data
         if not check_check:
             check = False
     path.write_text(json.dumps(data), encoding='utf-8')
 
-    message = f'Удалена фраза: {spec_word}'
+    message = f'Удалена фраза: {spec_word}\nС ответом: {answer}'
     messages_send(message, event.chat_id)
     return
 
@@ -128,12 +129,6 @@ def send_photo(vk, peer_id, owner_id, photo_id, access_key):
         attachment=attachment
     )
 if __name__ == '__main__':
-    a = '{мем?}'
-    text = 'мама мыла раму? {мем?}'
-    remove_word(a,text)
-    b = ''
-
-
     vk_session = vk_api.VkApi(token='d46a2fe9935df81a4ab27e37f897fb43bd123237bcab1ec388cfdf72f2f84c87c0148f83f04ec04745860')
     longpoll = VkBotLongPoll(vk_session, 204155469)
     vk = vk_session.get_api()
@@ -162,12 +157,13 @@ if __name__ == '__main__':
             if '!добавить' in textLower:
                 if event.from_chat:
                     answer = ""
-                    spec_word = remove_word('!добавить', textLower)
+                    spec_word = remove_word('!добавить', textNormal)
                     spec_word = remove_word('!Добавить', spec_word)
+
 
                     if spec_word.find("{") > 0 and spec_word.find("}") > 0:
                         answer = spec_word[spec_word.find("{"): spec_word.find("}") + 1]
-                        spec_word = remove_word(answer, spec_word)
+                        spec_word = remove_word(answer, spec_word).lower()
 
                         used = False
                         for item in data['values']:
