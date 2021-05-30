@@ -1,1 +1,9 @@
-{"values": [{"question": "\u043d\u0435\u0442", "answer": "\u041f\u0438\u0434\u043e\u0440\u0430 \u043e\u0442\u0432\u0435\u0442", "type": "text"}, {"question": "\u0434\u0430\u0434\u0430", "answer": "https://sun9-65.userapi.com/impg/ia49S9-MNeKSpiHGnpm4KkMdNXGWDhvipdnQGg/tZaia8nCse4.jpg?size=720x488&quality=96&sign=ab99722d88de82c094b1fc0e31dd6308&c_uniq_tag=1pYN5S422P_fKipNobbhvINtTkNuITUw1g_Esxb95uo&type=album", "type": "photo"}, {"question": "\u0434\u0430", "answer": "\u041f\u0438\u0437\u0434\u0430", "type": "text"}, {"question": "\u0434\u0430 \u0434\u0430", "answer": "https://sun9-58.userapi.com/impg/FALGeDzFjkFCkz1K1-oTiSNvNzR0pGWsb49LqA/kH3E6I3HRqk.jpg?size=510x346&quality=96&sign=0e866cbe62f43869c6b177f2441e2d0d&c_uniq_tag=oo1x3MlDIA2GkO-yGILeQuc7aERYOjp5c3Uy7XzC_oE&type=album", "type": "photo"}]}
+{
+  "values": [
+    {
+      "question":"да",
+      "answer": "Пезда",
+      "type": "text"
+    }
+  ]
+}

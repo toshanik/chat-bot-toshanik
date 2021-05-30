@@ -7,7 +7,7 @@ from pathlib import Path
 from io import BytesIO
 import requests
 from vk_api.upload import VkUpload
-
+import datetime
 
 
 
@@ -121,13 +121,6 @@ def upload_photo(upload, url):
     return owner_id, photo_id, access_key
 
 
-def send_photo(vk, peer_id, owner_id, photo_id, access_key):
-    attachment = f'photo{owner_id}_{photo_id}_{access_key}'
-    vk.messages.send(
-        random_id=get_random_id(),
-        chat_id=chat_id,
-        attachment=attachment
-    )
 if __name__ == '__main__':
     vk_session = vk_api.VkApi(token='d46a2fe9935df81a4ab27e37f897fb43bd123237bcab1ec388cfdf72f2f84c87c0148f83f04ec04745860')
     longpoll = VkBotLongPoll(vk_session, 204155469)
@@ -135,7 +128,6 @@ if __name__ == '__main__':
     Lslongpoll = VkLongPoll(vk_session)
     Lsvk = vk_session.get_api()
     upload = VkUpload(vk)
-
     key = '5e10586fd85a211cb5e26fe53f5ba3f477caa84d'  # ВСТАВИТЬ ПАРАМЕТРЫ
     server = 'https://lp.vk.com/wh204155469'
     ts = '1'
@@ -150,6 +142,7 @@ if __name__ == '__main__':
     data = json.loads(path.read_text(encoding='utf-8'))
     for event in longpoll.listen():
         if event.type == VkBotEventType.MESSAGE_NEW:
+
             textNormal = get_text(event)
             textLower = textNormal.lower()
             if (textLower == ""):
@@ -217,6 +210,11 @@ if __name__ == '__main__':
                         messages_send("Добавьте фразу     (Например: \"!Удалить да\")", event.chat_id)
                     else:
                         delete_word(spec_word)
+            if '!сохранить' in textLower:
+                if event.obj.from_id == 131753976:
+                    user_token = '89fa88aca65e969f8a15a56a578f650b02602ba1fe5d26f8a8aa80898273db55b14eabeb0b5f4f93fa482'
+                    upload2 = VkUpload(vk_api.VkApi(token=user_token).get_api())
+                    document = upload2.document('data.json', title=f"Словарь chat-bot-toshanik {datetime.datetime.now()}")
             for item in data['values']:
                 if (item['question'] == textLower):
                     if item['type'] == 'text':
